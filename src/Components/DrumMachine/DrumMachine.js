@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 import Display from '../Display/Display';
 import DrumPad from '../DrumPad/DrumPad';
+import * as DrumActions from '../../store/actions/drumActions';
 
 class drumMachine extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      padButtonName: '',
       buttons: [
         {
           name: 'Heater-1',
@@ -68,9 +69,10 @@ class drumMachine extends Component {
   }
 
   componentDidMount () {
-    document.addEventListener('keydown', this.onKeyDownHandler);
+    document.addEventListener('keydown', this.props.onKeyDownHandler);
   }
 
+  /*
   onClickHandler = (e) => {
     const displayText = e.target.getAttribute('id');
     const audio = document.querySelector(`#${e.target.textContent}`);
@@ -78,7 +80,9 @@ class drumMachine extends Component {
     audio.play();
     this.setState({padButtonName: displayText});         
   }
+  */
 
+  /*
   onKeyDownHandler = (e) => {
     const keyCode = e.keyCode;
     const audio = document.querySelector(`audio[data-key="${keyCode}"]`);
@@ -90,7 +94,8 @@ class drumMachine extends Component {
     }
     console.log(audio);
               
-  }
+  } 
+  */
 
 
   render(){
@@ -103,15 +108,28 @@ class drumMachine extends Component {
           audioUrl={button.audio}
           buttonName={button.keyTrigger}
           dataKey={button.keyCode}
-          onClick={(e) => this.onClickHandler(e)}>{button.keyTrigger}</DrumPad>)
+          onClick={this.props.onClickHandler}>{button.keyTrigger}</DrumPad>)
     })
     return (
       <div id='drum-machine'>
-        <Display text={this.state.padButtonName}/>
+        <Display text={this.props.padButtonName}/>
         {buttons}
       </div>
     );
   }
 }
 
-export default drumMachine;
+const mapStateToProps = (state) => {
+  return {
+    padButtonName: state.padButtonName
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onClickHandler: (event) => dispatch(DrumActions.clickHandlerAction(event)),
+    onKeyDownHandler: (event) => dispatch(DrumActions.keyDownAction(event))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(drumMachine);
